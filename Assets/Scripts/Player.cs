@@ -3,11 +3,22 @@ using System.Collections;
 using System;
 
 public class Player : MonoBehaviour {
+
+    public enum Operation
+    {
+        FirstView,
+        ThirdView
+    };
+
+    public Operation operation = Operation.ThirdView;
+
     private int bombPower;          //炸弹威力[范围1到4格]
     private float moveSpeed ;       //移动速度
     private int bombNums;           //可以释放的炸弹数量,释放一个减一，炸一个加一
+    public Camera _camera;
     public bool isCanControl;
     
+
     public int BombPower{
         set { bombPower = value; }
         get { return bombPower; }
@@ -48,6 +59,8 @@ public class Player : MonoBehaviour {
         bombPower = 2;
         MoveSpeed = 5.0f;
 
+        operation = MenuManager.choose ? Operation.FirstView : Operation.ThirdView;
+
         GlobalManager = GameObject.Find("Global State Manager").GetComponent<GlobalStateManager>();
         rigidBody = GetComponent<Rigidbody>();
         myTransform = transform;
@@ -60,13 +73,36 @@ public class Player : MonoBehaviour {
         {
             BombPlace = GameObject.Find("PlayerBombs/Player2").transform;
         }
+
+        switch (operation)
+        {
+            case Operation.FirstView:
+                {
+                    //Camera.main.enabled = false;
+                    if (playerNumber == 1)
+                    {
+                        _camera.rect = new Rect(0, 0, 0.5f, 1);           
+                    }
+                    else
+                    {
+                        _camera.rect = new Rect(0.5f, 0, 0.5f, 1);
+                    }
+                    
+                    break;
+                }
+            case Operation.ThirdView:
+                {
+                    //Camera.main.enabled = true;
+                    _camera.enabled = false;
+                    break;
+                }
+        }
     }
 
     // Update is called once per frame
     void Update() {
         if (!isCanControl)
             return;
-
         UpdateMovement();
     }
 
@@ -90,66 +126,151 @@ public class Player : MonoBehaviour {
     /// Updates Player 1's movement and facing rotation using the WASD keys and drops bombs using Space
     /// </summary>
     private void UpdatePlayer1Movement() {
-        if (Input.GetKey(KeyCode.W)) { //Up movement
-            rigidBody.velocity = new Vector3(rigidBody.velocity.x, rigidBody.velocity.y, moveSpeed);
-            myTransform.rotation = Quaternion.Euler(0, 0, 0);
-            animator.SetBool("Walking",true);
+
+        switch (operation)
+        {
+            case Operation.ThirdView:
+                {
+                    if (Input.GetKey(KeyCode.W))
+                    { //Up movement
+                        rigidBody.velocity = new Vector3(rigidBody.velocity.x, rigidBody.velocity.y, moveSpeed);
+                        myTransform.rotation = Quaternion.Euler(0, 0, 0);
+                        animator.SetBool("Walking", true);
+                    }
+
+                    if (Input.GetKey(KeyCode.A))
+                    { //Left movement
+                        rigidBody.velocity = new Vector3(-moveSpeed, rigidBody.velocity.y, rigidBody.velocity.z);
+                        myTransform.rotation = Quaternion.Euler(0, 270, 0);
+                        animator.SetBool("Walking", true);
+                    }
+
+                    if (Input.GetKey(KeyCode.S))
+                    { //Down movement
+                        rigidBody.velocity = new Vector3(rigidBody.velocity.x, rigidBody.velocity.y, -moveSpeed);
+                        myTransform.rotation = Quaternion.Euler(0, 180, 0);
+                        animator.SetBool("Walking", true);
+                    }
+
+                    if (Input.GetKey(KeyCode.D))
+                    { //Right movement
+                        rigidBody.velocity = new Vector3(moveSpeed, rigidBody.velocity.y, rigidBody.velocity.z);
+                        myTransform.rotation = Quaternion.Euler(0, 90, 0);
+                        animator.SetBool("Walking", true);
+                    }
+
+                    if (canDropBombs && Input.GetKeyDown(KeyCode.Space))
+                    { //Drop bomb
+                        DropBomb();
+                    }
+                    break;
+                }
+            case Operation.FirstView:
+                {
+                    if (Input.GetKey(KeyCode.W))
+                    {
+                        rigidBody.velocity = moveSpeed * this.transform.forward;
+                        animator.SetBool("Walking", true);
+                    }
+                    if (Input.GetKey(KeyCode.S))
+                    {
+                        rigidBody.velocity = moveSpeed * (-1.0f) * this.transform.forward;
+                        animator.SetBool("Walking", true);
+                    }
+                    if (Input.GetKey(KeyCode.A))
+                    {
+                        myTransform.Rotate(-90.0f * Vector3.up * Time.deltaTime);
+                        animator.SetBool("Walking", true);
+                    }
+                    if (Input.GetKey(KeyCode.D))
+                    {
+                        myTransform.Rotate(90.0f * Vector3.up * Time.deltaTime);
+                        animator.SetBool("Walking", true);
+                    }
+                    if (canDropBombs && Input.GetKeyDown(KeyCode.Space))
+                    { //Drop bomb
+                        DropBomb();
+                    }
+                    break;
+                }
         }
 
-        if (Input.GetKey(KeyCode.A)) { //Left movement
-            rigidBody.velocity = new Vector3(-moveSpeed, rigidBody.velocity.y, rigidBody.velocity.z);
-            myTransform.rotation = Quaternion.Euler(0, 270, 0);
-            animator.SetBool("Walking", true);
-        }
-
-        if (Input.GetKey(KeyCode.S)) { //Down movement
-            rigidBody.velocity = new Vector3(rigidBody.velocity.x, rigidBody.velocity.y, -moveSpeed);
-            myTransform.rotation = Quaternion.Euler(0, 180, 0);
-            animator.SetBool("Walking", true);
-        }
-
-        if (Input.GetKey(KeyCode.D)) { //Right movement
-            rigidBody.velocity = new Vector3(moveSpeed, rigidBody.velocity.y, rigidBody.velocity.z);
-            myTransform.rotation = Quaternion.Euler(0, 90, 0);
-            animator.SetBool("Walking", true);
-        }
-
-        if (canDropBombs && Input.GetKeyDown(KeyCode.Space)) { //Drop bomb
-            DropBomb();
-        }
+        
     }
 
     /// <summary>
     /// Updates Player 2's movement and facing rotation using the arrow keys and drops bombs using Enter or Return
     /// </summary>
     private void UpdatePlayer2Movement() {
-        if (Input.GetKey(KeyCode.UpArrow)) { //Up movement
-            rigidBody.velocity = new Vector3(rigidBody.velocity.x, rigidBody.velocity.y, moveSpeed);
-            myTransform.rotation = Quaternion.Euler(0, 0, 0);
-            animator.SetBool("Walking", true);
-        }
 
-        if (Input.GetKey(KeyCode.LeftArrow)) { //Left movement
-            rigidBody.velocity = new Vector3(-moveSpeed, rigidBody.velocity.y, rigidBody.velocity.z);
-            myTransform.rotation = Quaternion.Euler(0, 270, 0);
-            animator.SetBool("Walking", true);
-        }
+        switch(operation)
+        {
+            case Operation.ThirdView:
+                {
+                    if (Input.GetKey(KeyCode.UpArrow))
+                    { //Up movement
+                        rigidBody.velocity = new Vector3(rigidBody.velocity.x, rigidBody.velocity.y, moveSpeed);
+                        myTransform.rotation = Quaternion.Euler(0, 0, 0);
+                        animator.SetBool("Walking", true);
+                    }
 
-        if (Input.GetKey(KeyCode.DownArrow)) { //Down movement
-            rigidBody.velocity = new Vector3(rigidBody.velocity.x, rigidBody.velocity.y, -moveSpeed);
-            myTransform.rotation = Quaternion.Euler(0, 180, 0);
-            animator.SetBool("Walking", true);
-        }
+                    if (Input.GetKey(KeyCode.LeftArrow))
+                    { //Left movement
+                        rigidBody.velocity = new Vector3(-moveSpeed, rigidBody.velocity.y, rigidBody.velocity.z);
+                        myTransform.rotation = Quaternion.Euler(0, 270, 0);
+                        animator.SetBool("Walking", true);
+                    }
 
-        if (Input.GetKey(KeyCode.RightArrow)) { //Right movement
-            rigidBody.velocity = new Vector3(moveSpeed, rigidBody.velocity.y, rigidBody.velocity.z);
-            myTransform.rotation = Quaternion.Euler(0, 90, 0);
-            animator.SetBool("Walking", true);
-        }
+                    if (Input.GetKey(KeyCode.DownArrow))
+                    { //Down movement
+                        rigidBody.velocity = new Vector3(rigidBody.velocity.x, rigidBody.velocity.y, -moveSpeed);
+                        myTransform.rotation = Quaternion.Euler(0, 180, 0);
+                        animator.SetBool("Walking", true);
+                    }
 
-        if (canDropBombs && (Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Return))) { //Drop Bomb. For Player 2's bombs, allow both the numeric enter as the return key or players without a numpad will be unable to drop bombs
-            DropBomb();
+                    if (Input.GetKey(KeyCode.RightArrow))
+                    { //Right movement
+                        rigidBody.velocity = new Vector3(moveSpeed, rigidBody.velocity.y, rigidBody.velocity.z);
+                        myTransform.rotation = Quaternion.Euler(0, 90, 0);
+                        animator.SetBool("Walking", true);
+                    }
+
+                    if (canDropBombs && (Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Return)))
+                    { //Drop Bomb. For Player 2's bombs, allow both the numeric enter as the return key or players without a numpad will be unable to drop bombs
+                        DropBomb();
+                    }
+                    break;
+                }
+            case Operation.FirstView:
+                {
+                    if (Input.GetKey(KeyCode.UpArrow))
+                    {
+                        rigidBody.velocity = moveSpeed * this.transform.forward;
+                        animator.SetBool("Walking", true);
+                    }
+                    if (Input.GetKey(KeyCode.DownArrow))
+                    {
+                        rigidBody.velocity = moveSpeed * (-1.0f) * this.transform.forward;
+                        animator.SetBool("Walking", true);
+                    }
+                    if (Input.GetKey(KeyCode.LeftArrow))
+                    {
+                        myTransform.Rotate(-90.0f * Vector3.up * Time.deltaTime);
+                        animator.SetBool("Walking", true);
+                    }
+                    if (Input.GetKey(KeyCode.RightArrow))
+                    {
+                        myTransform.Rotate(90.0f * Vector3.up * Time.deltaTime);
+                        animator.SetBool("Walking", true);
+                    }
+                    if (canDropBombs && (Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Return)))
+                    { //Drop Bomb. For Player 2's bombs, allow both the numeric enter as the return key or players without a numpad will be unable to drop bombs
+                        DropBomb();
+                    }
+                    break;
+                }
         }
+        
     }
 
     /// <summary>
@@ -175,4 +296,5 @@ public class Player : MonoBehaviour {
             Destroy(gameObject);
         }
     }
+
 }

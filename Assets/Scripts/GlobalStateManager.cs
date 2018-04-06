@@ -15,6 +15,7 @@ public class GlobalStateManager : MonoBehaviour {
     public GameObject Box;
     public bool RandomProductItem = false;
 
+    private int BoxNum = 30;
     private bool gamebegin = false;
     public bool gameBegin
     {
@@ -45,7 +46,7 @@ public class GlobalStateManager : MonoBehaviour {
         Instantiate(Player1,StartPos[0].transform.position,StartPos[0].transform.rotation);
         Instantiate(Player2,StartPos[1].transform.position,StartPos[1].transform.rotation);
         gameBegin = true;
-        BoxProduct(12);
+        BoxProduct(BoxNum);
     }
 
     private void Update()
@@ -150,7 +151,7 @@ public class GlobalStateManager : MonoBehaviour {
             Destroy(var);
         }
         time = 0.0f;
-        BoxProduct(12);
+        BoxProduct(BoxNum);
     }
 
     public void ItemProduct()
