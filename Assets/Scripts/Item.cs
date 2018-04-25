@@ -4,17 +4,23 @@ using UnityEngine;
 
 public class Item : MonoBehaviour {
     //Item base Class
+    public Transform AllItem;
+
 
     public enum ITEM_TYPE
     {
         PowerBottle,
         SpeedShoes,
-        MoreBombs
+        MoreBombs,
+        MedicalBox,
+        ElectricWeapon
     };
 
     public ITEM_TYPE itemType;
 	// Use this for initialization
 	void Start () {
+        AllItem = GameObject.Find("AllItems").transform;
+        this.transform.SetParent(AllItem);
 	}
 	
 	// Update is called once per frame
@@ -24,8 +30,12 @@ public class Item : MonoBehaviour {
 
     private void OnTriggerEnter(Collider other)
     {
-        
-        if(other.tag == "Player")
+        if (other.CompareTag("Explosion"))
+        {
+            Destroy(this.gameObject);
+        }
+
+        if (other.tag == "Player")
         {
             switch (itemType)
             {
@@ -43,6 +53,31 @@ public class Item : MonoBehaviour {
                     {
                         other.GetComponent<Player>().MoveSpeed += 1.0f;
                         break;
+                    }
+                case ITEM_TYPE.MedicalBox:
+                    {
+                        if(other.GetComponent<Player>().playerNumber != 1)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            other.GetComponent<Player>().MedicalNums++;
+                            break;
+                        }
+
+                    }
+                case ITEM_TYPE.ElectricWeapon:
+                    {
+                        if (other.GetComponent<Player>().playerNumber != 1)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            other.GetComponent<Player>().EleWeaponNums++;
+                            break;
+                        }
                     }
             }
             Destroy(this.gameObject);

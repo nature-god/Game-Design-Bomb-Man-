@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.Networking;
 using System.Runtime.CompilerServices;
 
 public class Bomb : MonoBehaviour
@@ -13,19 +14,12 @@ public class Bomb : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        if (this.transform.parent.name == "Player1")
-        {
-            producer = GameObject.Find("Player 1(Clone)");
-        }
-        else
-        {
-            producer = GameObject.Find("Player 2(Clone)");
-        }
+        producer = GameObject.Find("localPlayer");          //获取player
         power = producer.GetComponent<Player>().BombPower;
         Invoke("Explode", 3f); //Call Explode in 3 seconds
     }
 
-    void Explode()
+    public void Explode()
     {
         //Explosion sound
         AudioSource.PlayClipAtPoint(explosionSound, transform.position);
@@ -65,13 +59,16 @@ public class Bomb : MonoBehaviour
 
             if (!hit.collider)
             { // Free space, make a new explosion
-                Instantiate(explosionPrefab, transform.position + (i * direction), explosionPrefab.transform.rotation);
+                var tmp = Instantiate(explosionPrefab, transform.position + (i * direction), explosionPrefab.transform.rotation);
+                NetworkServer.Spawn(tmp);
             }
             else
             { //Hit a block, stop spawning in this direction
-                if (hit.collider.CompareTag("Box"))
+                if (hit.collider.CompareTag("Box")|| hit.collider.CompareTag("BossBox"))
                 {
-                    Instantiate(explosionPrefab, transform.position + (i * direction), explosionPrefab.transform.rotation).transform.GetChild(0).gameObject.SetActive(false);
+                    var tmp = Instantiate(explosionPrefab, transform.position + (i * direction), explosionPrefab.transform.rotation);
+                    tmp.transform.GetChild(0).gameObject.SetActive(false);
+                    NetworkServer.Spawn(tmp);
                 }
                 break;
             }

@@ -1,144 +1,71 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using UnityEngine.Networking;
 
-public class GlobalStateManager : MonoBehaviour {
+public class GlobalStateManager : NetworkBehaviour {
+
+    public bool ExitDoor = false;
+
     public Transform AllBoxs;
     public Transform AllItems;
-    public GameObject Player1;
-    public GameObject Player2;
     public GameObject[] StartPos;
     public Text Message;
     public GameObject SpeedShoes;
     public GameObject BombPower;
     public GameObject BombNums;
     public GameObject Box;
-    public bool RandomProductItem = false;
+    public GameObject[] Players;
 
-    private int BoxNum = 30;
-    private bool gamebegin = false;
-    public bool gameBegin
-    {
-        set
-        {
-            foreach(GameObject var in GameObject.FindGameObjectsWithTag("Player"))
-            {
-                var.GetComponent<Player>().isCanControl = value;
-            }
-            gamebegin = value;
-        }
-        get
-        {
-            return gamebegin;
-        }
-    }
+    private int BoxNum = 30;                    //场地中刷新Box的最大数目
+    
+    private GameObject[] Blocks;                //获取场地边界
+    private GameObject[] Floor;                 //获取场地floor(地板块)
 
-    private GameObject[] Blocks;
-    private GameObject[] Floor;
-    private float time = 0.0f;
-    private int deadPlayers = 0;
-    private int deadPlayerNumber = -1;
-    private void Start()
+    private float freshTime = 60.0f;            //场地木块刷新频率
+    private float time = 0.0f;                  //场地木块刷新计时器
+    public bool gameOver = false;              //游戏是否结束
+    public int winner;                         //胜利者：0为玩家，1为boss
+
+    private bool flag = true;                  //控制游戏结束锁
+
+    private void Awake()
     {
         Blocks = GameObject.FindGameObjectsWithTag("Block");
         Floor = GameObject.FindGameObjectsWithTag("Floor");
-        Message.gameObject.SetActive(false);
-        Instantiate(Player1,StartPos[0].transform.position,StartPos[0].transform.rotation);
-        Instantiate(Player2,StartPos[1].transform.position,StartPos[1].transform.rotation);
-        gameBegin = true;
-        BoxProduct(BoxNum);
+        Players = new GameObject[5];
     }
 
     private void Update()
     {
-        if (!gameBegin)
+        if (gameOver)
+        {
             return;
+        }
         else
         {
-            if(RandomProductItem)
+            if (time <= freshTime)
             {
-                if (time <= 4.0f)
-                {
-                    time += Time.deltaTime;
-                }
-                else
-                {
-                    time = 0.0f;
-                    ItemProduct();
-                }
+                time += Time.deltaTime;
             }
             else
             {
-                return;
+                time = 0.0f;
+                CmdBoxProduct(BoxNum);
             }
+            Players = GetPlayers();
+            CmdbossWin();
         }
     }
 
-    public void PlayerDied(int playerNumber)
+    /// <summary>
+    /// 刷新场地内所有box
+    /// </summary>
+    /// <param name="num"></param>
+    [Command]
+    public void CmdBoxProduct(int num)
     {
-        deadPlayers++;
-
-        if (deadPlayers == 1)
-        {
-            deadPlayerNumber = playerNumber;
-            Invoke("CheckPlayersDeath", .3f);
-        }
-    }
-
-    void CheckPlayersDeath()
-    {
-        if (deadPlayers == 1)
-        { //Single dead player, he's the winner
-            Message.gameObject.SetActive(true);
-
-            if (deadPlayerNumber == 1)
-            { //P1 dead, P2 is the winner
-                Debug.Log("Player 2 is the winner!");
-                Message.color = Color.blue;
-                Message.text = "Player 2 is the winner!";
-            }
-            else
-            { //P2 dead, P1 is the winner
-                Debug.Log("Player 1 is the winner!");
-                Message.color = Color.red;
-                Message.text = "Player 1 is the winner!";
-            }
-        }
-        else
-        {  //Multiple dead players, it's a draw
-            Message.gameObject.SetActive(true);
-
-            Debug.Log("The game ended in a draw!");
-            Message.text = "The game ended in a draw!";
-        }
-        gameBegin = false;
-
-        StartCoroutine(Reset());
-    }
-
-    IEnumerator Reset()
-    {
-        yield return new WaitForSeconds(2.0f);
-        Setup();
-    }
-
-    public void Setup()
-    {
-        if(GameObject.Find("Player 1(Clone)") != null)
-        {
-            Destroy(GameObject.Find("Player 1(Clone)").gameObject);
-        }
-        if (GameObject.Find("Player 2(Clone)") != null)
-        {
-            Destroy(GameObject.Find("Player 2(Clone)").gameObject);
-        }
-        Instantiate(Player1, StartPos[0].transform.position, StartPos[0].transform.rotation);
-        Instantiate(Player2, StartPos[1].transform.position, StartPos[1].transform.rotation);
-        Message.gameObject.SetActive(false);
-        deadPlayers = 0;
-        deadPlayerNumber = -1;
-        gameBegin = true;
-        foreach(GameObject var in GameObject.FindGameObjectsWithTag("Item"))
+        foreach (GameObject var in GameObject.FindGameObjectsWithTag("Item"))
         {
             Destroy(var);
         }
@@ -148,54 +75,46 @@ public class GlobalStateManager : MonoBehaviour {
         }
         foreach (GameObject var in GameObject.FindGameObjectsWithTag("Bomb"))
         {
+            var.GetComponent<Bomb>().producer.GetComponent<Player>().BombNums++;
             Destroy(var);
         }
-        time = 0.0f;
-        BoxProduct(BoxNum);
-    }
 
-    public void ItemProduct()
-    {
-        int place = Random.Range(0, Floor.Length-1);
-        foreach(GameObject var in Blocks)
-        {
-            if((Floor[place].transform.position.x == var.transform.position.x) && (Floor[place].transform.position.z == var.transform.position.z))
-            {
-                return;
-            }
-        }
-        Vector3 temPos = new Vector3(Floor[place].transform.position.x, 0.70f, Floor[place].transform.position.z);
-        int temp = Random.Range(1,4);
-        if(temp == 1)
-        {
-            Instantiate(SpeedShoes,temPos,Floor[place].transform.rotation,AllItems);
-        }
-        else if(temp == 2)
-        {
-            Instantiate(BombPower, temPos, Floor[place].transform.rotation, AllItems);
-        }
-        else
-        {
-            Instantiate(BombNums, temPos, Floor[place].transform.rotation, AllItems);
-        }
-    }
-
-    public void BoxProduct(int num)
-    {
-        for(int i = 0;i<num;i++)
+        for (int i = 0; i < num; i++)
         {
             bool temp = true;
             int place = Random.Range(0, Floor.Length - 1);
+
+            if(GameObject.FindGameObjectWithTag("Door")!=null)
+            {
+                if ((Floor[place].transform.position.x == GameObject.FindGameObjectWithTag("Door").transform.position.x)
+                    && (Floor[place].transform.position.z == GameObject.FindGameObjectWithTag("Door").transform.position.z))
+                {
+                    temp = false;
+                }
+            }
+            if(GameObject.FindGameObjectsWithTag("BossBox")!=null)
+            {
+                foreach (GameObject var in GameObject.FindGameObjectsWithTag("BossBox"))
+                {
+                    if ((Floor[place].transform.position.x == var.transform.position.x)
+                        && (Floor[place].transform.position.z == var.transform.position.z))
+                    {
+                        temp = false;
+                        break;
+                    }
+                }
+            }
+
             foreach (GameObject var in Blocks)
             {
-                if ((Floor[place].transform.position.x == var.transform.position.x) 
+                if ((Floor[place].transform.position.x == var.transform.position.x)
                     && (Floor[place].transform.position.z == var.transform.position.z))
                 {
                     temp = false;
                     break;
                 }
             }
-           
+
             if (temp)
             {
                 foreach (GameObject var in GameObject.FindGameObjectsWithTag("Box"))
@@ -207,7 +126,7 @@ public class GlobalStateManager : MonoBehaviour {
                         break;
                     }
                 }
-                if(temp)
+                if (temp)
                 {
                     if (((StartPos[0].transform.position.x == Floor[place].transform.position.x) && (StartPos[0].transform.position.z == Floor[place].transform.position.z))
                         || ((StartPos[1].transform.position.x == Floor[place].transform.position.x) && (StartPos[1].transform.position.z == Floor[place].transform.position.z)))
@@ -217,9 +136,21 @@ public class GlobalStateManager : MonoBehaviour {
                     else
                     {
                         Vector3 temPos = new Vector3(Floor[place].transform.position.x, 0.50f, Floor[place].transform.position.z);
-                        Instantiate(Box, temPos, Floor[place].transform.rotation, AllBoxs);
+                        var gtmp = (GameObject)Instantiate(Box, temPos, Floor[place].transform.rotation, AllBoxs);
+
+                        if (!ExitDoor)
+                        {
+                            int s = Random.Range(0, 5);
+                            if (s == 4)
+                            {
+                                gtmp.GetComponent<Box>().ExitDoor = true;
+                                ExitDoor = true;
+                            }
+                        }
+
+                        NetworkServer.Spawn(gtmp);
                     }
-                }    
+                }
                 else
                 {
                     temp = true;
@@ -232,5 +163,64 @@ public class GlobalStateManager : MonoBehaviour {
                 continue;
             }
         }
+    }
+
+    public override void OnStartServer()
+    {
+        CmdBoxProduct(BoxNum);
+    }
+
+    [Command]
+    public void CmdbossWin()
+    {
+        foreach (GameObject tmp in Players)
+        {
+            if (tmp != null)
+            {
+                if (tmp.GetComponent<Player>().status != Player.Status.dead)
+                {
+                    gameOver = false;
+                    return;
+                }
+                else
+                {
+                    if (tmp.GetComponent<Player>().MedicalNums != 0)
+                    {
+                        gameOver = false;
+                        return;
+                    }
+                }
+            }
+            else
+            {
+                return;
+            }
+        }
+        winner = 1;
+        gameOver = true;
+    }
+
+    private GameObject[] GetPlayers()
+    {
+        int num = 0;
+        GameObject[] tmp = new GameObject[GameObject.FindGameObjectsWithTag("Player").Length];
+        foreach (GameObject temp in GameObject.FindGameObjectsWithTag("Player"))
+        {
+            if (temp.GetComponent<Player>().playerNumber == 1)
+            {
+                tmp[num] = temp;
+                num++;
+            }
+        }
+        return tmp;
+    }
+
+    private void OnGUI()
+    {
+        GUIStyle tmp = new GUIStyle();
+        tmp.fontSize = 20;
+        tmp.alignment = TextAnchor.MiddleCenter;
+        tmp.normal.textColor = Color.black;
+        GUI.Label(new Rect(50, 0, 100, 100), "下次地图刷新时间: "+((int)(freshTime - time)).ToString(),tmp);
     }
 }
