@@ -220,7 +220,7 @@ public class Player : NetworkBehaviour {
         Debug.Log("Awake");
         rigidBody = GetComponent<Rigidbody>();
         myTransform = this.transform;
-        animator = myTransform.Find("PlayerModel").GetComponent<Animator>();
+        animator = myTransform.Find("PlayerModel/Player").GetComponent<Animator>();
         tMedicalNums = GameObject.Find("Canvas/MedicalItems/Text").GetComponent<Text>();
         tElectricWeaponNums = GameObject.Find("Canvas/ElectricWeaponItems/Text").GetComponent<Text>();
         tBombNums = GameObject.Find("Canvas/BombNums/Text").GetComponent<Text>();
@@ -343,6 +343,7 @@ public class Player : NetworkBehaviour {
         if (playerNumber == 1)
         {
             //player
+            SetModel(1, 2, 3);
             switch (status)
             {
                 case Status.normal:
@@ -393,6 +394,8 @@ public class Player : NetworkBehaviour {
         }
         else if(playerNumber == 2)
         {
+            SetModel(0, 2, 3);
+
             SmallSkillCooling(boss1_small_skill_time);
             BigSkillCooling(boss1_big_skill_time);
             SetSmallCoolingTime(tMedicalNums, boss1_small_skill_time);
@@ -416,6 +419,8 @@ public class Player : NetworkBehaviour {
         }
         else if (playerNumber == 3)
         {
+            SetModel(0, 1, 3);
+
             SmallSkillCooling(boss2_small_skill_time);
             BigSkillCooling(boss2_big_skill_time);
             SetSmallCoolingTime(tMedicalNums, boss2_small_skill_time);
@@ -439,6 +444,8 @@ public class Player : NetworkBehaviour {
         }
         else if (playerNumber == 4)
         {
+            SetModel(0, 1, 2);
+
             SmallSkillCooling(boss3_small_skill_time);
             BigSkillCooling(boss3_big_skill_time);
             SetSmallCoolingTime(tMedicalNums, boss3_small_skill_time);
@@ -466,7 +473,10 @@ public class Player : NetworkBehaviour {
 
         CmdSynWalk(false);
         walkFlag = false;
-        animator.SetBool("Walking", walkFlag);
+        if(playerNumber == 1)
+        {
+            animator.SetBool("Walking", walkFlag);
+        }
 
         if (!canMove) { //Return if player can't move
             return;
@@ -481,7 +491,10 @@ public class Player : NetworkBehaviour {
             rigidBody.velocity = new Vector3(rigidBody.velocity.x, rigidBody.velocity.y, moveSpeed) * opposite_forward;
             myTransform.rotation = Quaternion.Euler(0, 180*opposite_rotate + 0, 0);
             walkFlag = true;
-            animator.SetBool("Walking", walkFlag);
+            if (playerNumber == 1)
+            {
+                animator.SetBool("Walking", walkFlag);
+            }
             CmdSynWalk(true);
         }
 
@@ -490,7 +503,10 @@ public class Player : NetworkBehaviour {
             rigidBody.velocity = new Vector3(-moveSpeed, rigidBody.velocity.y, rigidBody.velocity.z) * opposite_forward;
             myTransform.rotation = Quaternion.Euler(0, 180 * opposite_rotate + 270, 0);
             walkFlag = true;
-            animator.SetBool("Walking", walkFlag);
+            if (playerNumber == 1)
+            {
+                animator.SetBool("Walking", walkFlag);
+            }
             CmdSynWalk(true);
 
         }
@@ -500,7 +516,10 @@ public class Player : NetworkBehaviour {
             rigidBody.velocity = new Vector3(rigidBody.velocity.x, rigidBody.velocity.y, -moveSpeed) * opposite_forward;
             myTransform.rotation = Quaternion.Euler(0, 180 * opposite_rotate + 180, 0);
             walkFlag = true;
-            animator.SetBool("Walking", walkFlag);
+            if (playerNumber == 1)
+            {
+                animator.SetBool("Walking", walkFlag);
+            }
             CmdSynWalk(true);
 
         }
@@ -510,7 +529,10 @@ public class Player : NetworkBehaviour {
             rigidBody.velocity = new Vector3(moveSpeed, rigidBody.velocity.y, rigidBody.velocity.z) * opposite_forward;
             myTransform.rotation = Quaternion.Euler(0, 180 * opposite_rotate + 90, 0);
             walkFlag = true;
-            animator.SetBool("Walking", walkFlag);
+            if (playerNumber == 1)
+            {
+                animator.SetBool("Walking", walkFlag);
+            }
             CmdSynWalk(true);
 
         }
@@ -524,6 +546,18 @@ public class Player : NetworkBehaviour {
             }
                  
         }      
+    }
+    /// <summary>
+    /// 设置模型
+    /// </summary>
+    /// <param name="n1">禁用模型n1</param>
+    /// <param name="n2">禁用模型n2</param>
+    /// <param name="n3">禁用模型n3</param>
+    private void SetModel(int n1,int n2,int n3)
+    {
+        this.transform.Find("PlayerModel").GetChild(n1).gameObject.SetActive(false);
+        this.transform.Find("PlayerModel").GetChild(n2).gameObject.SetActive(false);
+        this.transform.Find("PlayerModel").GetChild(n3).gameObject.SetActive(false);
     }
 
     /// <summary>
