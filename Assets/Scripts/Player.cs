@@ -171,20 +171,24 @@ public class Player : NetworkBehaviour {
             case 1:
                 {
                     role = Role.player;
+                    SetModel(1, 2, 3);
                     break;
                 }
             case 2:
                 {
+                    SetModel(0, 2, 3);
                     role = Role.boss1;
                     break;
                 }
             case 3:
                 {
+                    SetModel(0, 1, 3);
                     role = Role.boss2;
                     break;
                 }
             case 4:
                 {
+                    SetModel(0, 1, 2);
                     role = Role.boss3;
                     break;
                 }
@@ -248,6 +252,7 @@ public class Player : NetworkBehaviour {
 
         if (playerNumber == 1)
         {
+            SetModel(1, 2, 3);
             SetSkillIcons("ElectricWeapon",Icon1);
             SetSkillIcons("medical", Icon2);
             BombNums = 2;
@@ -269,6 +274,7 @@ public class Player : NetworkBehaviour {
         //     2.主动刷新场地内的物块（冷却时间：20秒）
         else if (playerNumber == 2)
         {
+            SetModel(0, 2, 3);
             SetSkillIcons("small", Icon1);
             SetSkillIcons("Big", Icon2);
             BombNums = 6;
@@ -290,6 +296,7 @@ public class Player : NetworkBehaviour {
         //     2.旋舞（同时向四个方向发射飞镖）（冷却时间：20秒）；
         else if (playerNumber == 3)
         {
+            SetModel(0, 1, 3);
             SetSkillIcons("small", Icon1);
             SetSkillIcons("Big", Icon2);
             BombNums = 5;
@@ -311,6 +318,7 @@ public class Player : NetworkBehaviour {
         //      2.两极反转（游戏中所有玩家控制反向，持续5秒）  （冷却时间：30秒）
         else if (playerNumber == 4)
         {
+            SetModel(0, 1, 2);
             SetSkillIcons("small", Icon1);
             SetSkillIcons("Big", Icon2);
             BombNums = 5;
@@ -343,7 +351,6 @@ public class Player : NetworkBehaviour {
         if (playerNumber == 1)
         {
             //player
-            SetModel(1, 2, 3);
             switch (status)
             {
                 case Status.normal:
@@ -394,7 +401,6 @@ public class Player : NetworkBehaviour {
         }
         else if(playerNumber == 2)
         {
-            SetModel(0, 2, 3);
 
             SmallSkillCooling(boss1_small_skill_time);
             BigSkillCooling(boss1_big_skill_time);
@@ -419,7 +425,6 @@ public class Player : NetworkBehaviour {
         }
         else if (playerNumber == 3)
         {
-            SetModel(0, 1, 3);
 
             SmallSkillCooling(boss2_small_skill_time);
             BigSkillCooling(boss2_big_skill_time);
@@ -444,7 +449,6 @@ public class Player : NetworkBehaviour {
         }
         else if (playerNumber == 4)
         {
-            SetModel(0, 1, 2);
 
             SmallSkillCooling(boss3_small_skill_time);
             BigSkillCooling(boss3_big_skill_time);
