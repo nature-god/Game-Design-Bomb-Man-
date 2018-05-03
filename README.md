@@ -1,6 +1,16 @@
 # Game-Design-Bomb-Man- #
 ## 逃离炸弹世界 ##
 
+### Note:因为我的unity版本缘故，我把unity版本升到2018.2.0b1之后，对低版本的兼容好像出了点问题orz..所以最好大家也用2018.2.0b1............抱歉
+
+#### 下载地址：https://unity3d.com/cn/unity/beta-download
+
+![1525337626951](C:\Users\27269\AppData\Local\Temp\1525337626951.png)
+
+
+
+(请不要下载那个hub了)
+
 ### Game Version 1.1 ###
 * Unity Version : 2017.3.1f1
 * Now it is a Version 1.1 , support the first view and third view.
@@ -62,9 +72,23 @@
 ​			<li>玩家/boss胜利后提示画面</li>
 ​		</ul>
 ​	<li>逻辑代码设计：</li>
-​		<ul>
+		<ul>
 ​			<li>网络大厅身份选择</li>
 ​			<li>第三视角摄像机位置同步</li>
 ​			<li>一轮结束后开始下一局游戏的逻辑跳转</li>
 ​		</ul>
+</ul>
+
+#### 3.场景与音乐
+
+<ul>
+
+​	<li>游戏音乐</li>
+
+​	<li>炸弹爆炸音乐</li>
+
+​	<li>不同技能音乐</li>
+
+​	<li>其他等等</li>
+
 </ul>

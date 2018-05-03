@@ -340,6 +340,30 @@ public class Player : NetworkBehaviour {
 
     // Update is called once per frame
     void Update() {
+        switch(playerNumber)
+        {
+            case 1:
+                {
+                    SetModel(1, 2, 3);
+                    break;
+                }
+            case 2:
+                {
+                    SetModel(0, 2, 3);
+                    break;
+                }
+            case 3:
+                {
+                    SetModel(0, 1, 3);
+                    break;
+                }
+            case 4:
+                {
+                    SetModel(0, 1, 2);
+                    break;
+                }
+        }
+
         if (!isLocalPlayer)
         {
             return;
