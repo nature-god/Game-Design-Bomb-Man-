@@ -23,6 +23,7 @@
       + Space for bomb
       + J     for skill1/medical box
       + K     for skill2/electric weapons
+      
 #### TO DO： ####
 
 #### 1.模型贴图素材：
@@ -56,6 +57,7 @@
 ​			<li>玩家位移相反图标</li>
 ​		</ul>
 </ul>
+
 #### 2.场景设计与逻辑
 <ul>
 ​	<li>场景设计：</li>
@@ -71,6 +73,7 @@
 ​			<li>一轮结束后开始下一局游戏的逻辑跳转</li>
 ​		</ul>
 </ul>
+
 #### 3.场景与音乐
 <ul>
 ​	<li>游戏音乐</li>
