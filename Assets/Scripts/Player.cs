@@ -171,24 +171,24 @@ public class Player : NetworkBehaviour {
             case 1:
                 {
                     role = Role.player;
-                    SetModel(1, 2, 3);
+                    SetModel(true, false, false,false);
                     break;
                 }
             case 2:
                 {
-                    SetModel(0, 2, 3);
+                    SetModel(false, true, false,false);
                     role = Role.boss1;
                     break;
                 }
             case 3:
                 {
-                    SetModel(0, 1, 3);
+                    SetModel(false, false,true, false);
                     role = Role.boss2;
                     break;
                 }
             case 4:
                 {
-                    SetModel(0, 1, 2);
+                    SetModel(false,false,false,true);
                     role = Role.boss3;
                     break;
                 }
@@ -252,7 +252,7 @@ public class Player : NetworkBehaviour {
 
         if (playerNumber == 1)
         {
-            SetModel(1, 2, 3);
+            SetModel(true,false,false,false);
             SetSkillIcons("ElectricWeapon",Icon1);
             SetSkillIcons("medical", Icon2);
             BombNums = 2;
@@ -274,7 +274,7 @@ public class Player : NetworkBehaviour {
         //     2.主动刷新场地内的物块（冷却时间：20秒）
         else if (playerNumber == 2)
         {
-            SetModel(0, 2, 3);
+            SetModel(false,true,false,false);
             SetSkillIcons("small", Icon1);
             SetSkillIcons("Big", Icon2);
             BombNums = 6;
@@ -296,7 +296,7 @@ public class Player : NetworkBehaviour {
         //     2.旋舞（同时向四个方向发射飞镖）（冷却时间：20秒）；
         else if (playerNumber == 3)
         {
-            SetModel(0, 1, 3);
+            SetModel(false,false,true,false);
             SetSkillIcons("small", Icon1);
             SetSkillIcons("Big", Icon2);
             BombNums = 5;
@@ -318,7 +318,7 @@ public class Player : NetworkBehaviour {
         //      2.两极反转（游戏中所有玩家控制反向，持续5秒）  （冷却时间：30秒）
         else if (playerNumber == 4)
         {
-            SetModel(0, 1, 2);
+            SetModel(false,false,false,true);
             SetSkillIcons("small", Icon1);
             SetSkillIcons("Big", Icon2);
             BombNums = 5;
@@ -344,22 +344,22 @@ public class Player : NetworkBehaviour {
         {
             case 1:
                 {
-                    SetModel(1, 2, 3);
+                    SetModel(true,false,false,false);
                     break;
                 }
             case 2:
                 {
-                    SetModel(0, 2, 3);
+                    SetModel(false,true,false,false);
                     break;
                 }
             case 3:
                 {
-                    SetModel(0, 1, 3);
+                    SetModel(false,false,true,false);
                     break;
                 }
             case 4:
                 {
-                    SetModel(0, 1, 2);
+                    SetModel(false,false,false,true);
                     break;
                 }
         }
@@ -581,11 +581,12 @@ public class Player : NetworkBehaviour {
     /// <param name="n1">禁用模型n1</param>
     /// <param name="n2">禁用模型n2</param>
     /// <param name="n3">禁用模型n3</param>
-    private void SetModel(int n1,int n2,int n3)
+    private void SetModel(bool n1,bool n2,bool n3,bool n4)
     {
-        this.transform.Find("PlayerModel").GetChild(n1).gameObject.SetActive(false);
-        this.transform.Find("PlayerModel").GetChild(n2).gameObject.SetActive(false);
-        this.transform.Find("PlayerModel").GetChild(n3).gameObject.SetActive(false);
+        this.transform.Find("PlayerModel").GetChild(0).gameObject.SetActive(n1);
+        this.transform.Find("PlayerModel").GetChild(1).gameObject.SetActive(n2);
+        this.transform.Find("PlayerModel").GetChild(2).gameObject.SetActive(n3);
+        this.transform.Find("PlayerModel").GetChild(3).gameObject.SetActive(n4);
     }
 
     /// <summary>
