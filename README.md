@@ -4,12 +4,7 @@
 ### Note:因为我的unity版本缘故，我把unity版本升到2018.2.0b1之后，对低版本的兼容好像出了点问题orz..所以最好大家也用2018.2.0b1............抱歉
 
 #### 下载地址：https://unity3d.com/cn/unity/beta-download
-
-![1525337626951](C:\Users\27269\AppData\Local\Temp\1525337626951.png)
-
-
-
-(请不要下载那个hub了)
+(请不要错下载成那个hub了)
 
 ### Game Version 1.1 ###
 * Unity Version : 2017.3.1f1
@@ -28,10 +23,10 @@
       + Space for bomb
       + J     for skill1/medical box
       + K     for skill2/electric weapons
+      
 #### TO DO： ####
 
 #### 1.模型贴图素材：
-
 <ul>	
 ​	<li>医疗包</li>
 ​		<ul>
@@ -80,15 +75,9 @@
 </ul>
 
 #### 3.场景与音乐
-
 <ul>
-
 ​	<li>游戏音乐</li>
-
 ​	<li>炸弹爆炸音乐</li>
-
 ​	<li>不同技能音乐</li>
-
 ​	<li>其他等等</li>
-
 </ul>
