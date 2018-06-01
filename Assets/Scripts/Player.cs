@@ -63,10 +63,37 @@ public class Player : NetworkBehaviour {
     public Text tBombPower;
     public Text tSpeedShoes;
 
-    private int bombPower;          //炸弹威力[范围1到4格]
-    private float moveSpeed ;       //移动速度
-    private int bombNums;           //可以释放的炸弹数量,释放一个减一，炸一个加一
+    [SyncVar(hook ="SetPower")]
+    public int bombPower;          //炸弹威力[范围1到4格]
+    private void SetPower(int value)
+    {
+        bombPower = value;
+    }
+    [Command]
+    private void CmdPower(int value)
+    {
 
+        bombPower = value;
+    }
+
+    private float moveSpeed ;       //移动速度
+
+    [SyncVar(hook ="SetBombNum")]
+    public int bombNums;           //可以释放的炸弹数量,释放一个减一，炸一个加一
+    private void SetBombNum(int value)
+    {
+        bombNums = value;
+        if (isLocalPlayer)
+        {
+            tBombNums.text = bombNums.ToString();
+        }
+    }
+
+    [Command]
+    private void CmdNums(int value)
+    {
+        bombNums = value;
+    }
     private Image Icon1;            //图标1：对应玩家的医疗包，boss的小技能
 
     public GameObject helpedFriend;
@@ -105,6 +132,7 @@ public class Player : NetworkBehaviour {
     public int BombPower{
         set {
             bombPower = value;
+            CmdPower(bombPower);
             if(isLocalPlayer)
             {
                 tBombPower.text = bombPower.ToString();
@@ -125,11 +153,14 @@ public class Player : NetworkBehaviour {
     }
     public int BombNums
     {
-        set { bombNums = value;
-            if (isLocalPlayer)
-            {
-                tBombNums.text = bombNums.ToString();
-            }
+        set
+        {
+            bombNums = value;
+            CmdNums(bombNums);
+            //if (isLocalPlayer)
+            //{
+            //    tBombNums.text = bombNums.ToString();
+            //}
         }
         get { return bombNums; }
     }
@@ -526,7 +557,7 @@ public class Player : NetworkBehaviour {
             CmdSynWalk(true);
         }
 
-        if (Input.GetKey(KeyCode.A))
+        else if (Input.GetKey(KeyCode.A))
         { //Left movement
             rigidBody.velocity = new Vector3(-moveSpeed, rigidBody.velocity.y, rigidBody.velocity.z) * opposite_forward;
             myTransform.rotation = Quaternion.Euler(0, 180 * opposite_rotate + 270, 0);
@@ -539,7 +570,7 @@ public class Player : NetworkBehaviour {
 
         }
 
-        if (Input.GetKey(KeyCode.S))
+        else if (Input.GetKey(KeyCode.S))
         { //Down movement
             rigidBody.velocity = new Vector3(rigidBody.velocity.x, rigidBody.velocity.y, -moveSpeed) * opposite_forward;
             myTransform.rotation = Quaternion.Euler(0, 180 * opposite_rotate + 180, 0);
@@ -552,7 +583,7 @@ public class Player : NetworkBehaviour {
 
         }
 
-        if (Input.GetKey(KeyCode.D))
+        else if (Input.GetKey(KeyCode.D))
         { //Right movement
             rigidBody.velocity = new Vector3(moveSpeed, rigidBody.velocity.y, rigidBody.velocity.z) * opposite_forward;
             myTransform.rotation = Quaternion.Euler(0, 180 * opposite_rotate + 90, 0);
@@ -643,6 +674,12 @@ public class Player : NetworkBehaviour {
     [ClientRpc]
     void RpcSliderSetActive(bool value)
     {
+        if(!value)
+        {
+            this.GetComponent<SurvivalSlider>().processOver = false;
+            this.GetComponent<SurvivalSlider>().processValue = 0.0f;
+            this.GetComponent<SurvivalSlider>().slider.value = 0.0f;
+        }
         slider.SetActive(value);
     }
 
@@ -665,8 +702,10 @@ public class Player : NetworkBehaviour {
         var btmp = Instantiate(bombPrefab,
                     new Vector3(Mathf.RoundToInt(myTransform.position.x), bombPrefab.transform.position.y, Mathf.RoundToInt(myTransform.position.z)),
                     bombPrefab.transform.rotation);
+        btmp.GetComponent<Bomb>().producer = this.gameObject;
         NetworkServer.Spawn(btmp);
     }
+    
 
     /// <summary>
     /// 眩晕时长

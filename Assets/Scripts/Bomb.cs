@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine.Networking;
 using System.Runtime.CompilerServices;
 
-public class Bomb : MonoBehaviour
+public class Bomb : NetworkBehaviour
 {
     public AudioClip explosionSound;
     public GameObject explosionPrefab;
@@ -14,7 +14,8 @@ public class Bomb : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        producer = GameObject.Find("localPlayer");          //获取player
+
+        //producer = GameObject.Find("localPlayer");          //获取player
         power = producer.GetComponent<Player>().BombPower;
         Invoke("Explode", 3f); //Call Explode in 3 seconds
     }
@@ -36,8 +37,14 @@ public class Bomb : MonoBehaviour
         GetComponent<MeshRenderer>().enabled = false; //Disable mesh
         exploded = true;
         transform.Find("Collider").gameObject.SetActive(false); //Disable the collider
-        producer.GetComponent<Player>().BombNums++;
+        CmdBombNums();
         Destroy(gameObject, .3f); //Destroy the actual bomb in 0.3 seconds, after all coroutines have finished       
+    }
+
+    [Command]
+    public void CmdBombNums()
+    {
+        producer.GetComponent<Player>().BombNums++;
     }
 
     public void OnTriggerEnter(Collider other)

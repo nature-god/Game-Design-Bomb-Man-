@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -30,8 +31,14 @@ public class CameraControl : MonoBehaviour {
     {
         if(_localPlayer == null)
         {
-            _localPlayer = GameObject.Find("localPlayer").transform;
-
+            try
+            {
+                _localPlayer = GameObject.Find("localPlayer").transform;
+            }
+            catch(Exception e)
+            {
+                Debug.Log(e.Message);
+            }
         }
         _transform.position = new Vector3(_localPlayer.position.x, ftmp, _localPlayer.position.z-5);
         //if (_localPlayer == null)

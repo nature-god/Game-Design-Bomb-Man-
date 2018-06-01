@@ -17,7 +17,7 @@ public class GlobalStateManager : NetworkBehaviour {
     public GameObject Box;
     public GameObject[] Players;
 
-    private int BoxNum = 30;                    //场地中刷新Box的最大数目
+    private int BoxNum = 50;                    //场地中刷新Box的最大数目
     
     private GameObject[] Blocks;                //获取场地边界
     private GameObject[] Floor;                 //获取场地floor(地板块)
@@ -65,12 +65,14 @@ public class GlobalStateManager : NetworkBehaviour {
     [Command]
     public void CmdBoxProduct(int num)
     {
+        //清空场景中的其他物体
         foreach (GameObject var in GameObject.FindGameObjectsWithTag("Item"))
         {
             Destroy(var);
         }
         foreach (GameObject var in GameObject.FindGameObjectsWithTag("Box"))
         {
+            ExitDoor = false;
             Destroy(var);
         }
         foreach (GameObject var in GameObject.FindGameObjectsWithTag("Bomb"))

@@ -26,12 +26,6 @@ public class SurvivalSlider : NetworkBehaviour {
     public Slider slider;
     public Text text;
 
-	// Use this for initialization
-	void Start () {
-        //slider = this.GetComponent<Slider>();
-        //text = this.transform.GetChild(0).GetComponent<Text>();
-	}
-	
 	// Update is called once per frame
 	void Update () {
         if(!isLocalPlayer)
@@ -52,9 +46,20 @@ public class SurvivalSlider : NetworkBehaviour {
         }
         if (slider.value >= slider.maxValue)
         {
+            processValue = 0.0f;
+            slider.value = 0.0f;
+            CmdSetSLider(processValue);
             processOver = true;
             CmdSetProcessValue(true);
         }
+    }
+    private void OnEnable()
+    {
+        processOver = false;
+        CmdSetProcessValue(false);
+        processValue = 0.0f;
+        slider.value = 0.0f;
+        CmdSetSLider(processValue);
     }
 
     [Command]
