@@ -284,8 +284,8 @@ public class Player : NetworkBehaviour {
         if (playerNumber == 1)
         {
             SetModel(true,false,false,false);
-            SetSkillIcons("ElectricWeapon",Icon1);
-            SetSkillIcons("medical", Icon2);
+            SetSkillIcons("newIcons/medical", Icon1);
+            SetSkillIcons("newIcons/ele", Icon2);
             BombNums = 2;
             BombPower = 2;
             MoveSpeed = 5.0f;
