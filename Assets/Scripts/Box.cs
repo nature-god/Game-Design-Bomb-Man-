@@ -10,8 +10,10 @@ public class Box : NetworkBehaviour {
     public GameObject[] Items;
     public GameObject Door;
     public bool ExitDoor = false;
+    public AudioSource audioSource;
 	// Use this for initialization
 	void Start () {
+        audioSource = GetComponent<AudioSource>(); 
         AllBox = GameObject.Find("Map/Boxs").transform;
         this.transform.SetParent(AllBox);
 	}
@@ -25,11 +27,13 @@ public class Box : NetworkBehaviour {
     {
         if (other.CompareTag("Explosion")&&(!ExitDoor))
         {
+            audioSource.Play();
             CmdOnRangdom();         
         }
 
         if (other.CompareTag("Explosion")&&(ExitDoor))
         {
+            audioSource.Play();
             CmdDoor();
         }
     }

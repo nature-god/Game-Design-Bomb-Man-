@@ -13,7 +13,6 @@ public class Player : NetworkBehaviour {
         boss2,
         boss3
     }
-
     public enum Status
     {
         normal,                      //正常状态
@@ -23,6 +22,9 @@ public class Player : NetworkBehaviour {
         dead,                        //濒死状态
         help                         //救助他人状态
     };
+
+    public AudioSource audio1;
+    public AudioSource audio2;
 
     private float boss1_small_skill_time = 2.0f;
     private float boss1_big_skill_time = 20.0f;
@@ -291,6 +293,8 @@ public class Player : NetworkBehaviour {
             MoveSpeed = 5.0f;
             EleWeaponNums = 1;
             MedicalNums = 1;
+            audio1.clip = SetClip("player1");
+            audio2.clip = SetClip("player2");
             role = Role.player;
             //this.transform.name = "localPlayer";
         }
@@ -306,13 +310,15 @@ public class Player : NetworkBehaviour {
         else if (playerNumber == 2)
         {
             SetModel(false,true,false,false);
-            SetSkillIcons("small", Icon1);
-            SetSkillIcons("Big", Icon2);
+            SetSkillIcons("block", Icon1);
+            SetSkillIcons("refresh", Icon2);
             BombNums = 6;
             BombPower = 3;
             MoveSpeed = 8.0f;
             EleWeaponNums = 1;
             MedicalNums = 1;
+            audio1.clip = SetClip("boss11");
+            audio2.clip = SetClip("boss12");
             role = Role.boss1;
             //this.transform.name = "Boss1";
         }
@@ -328,13 +334,15 @@ public class Player : NetworkBehaviour {
         else if (playerNumber == 3)
         {
             SetModel(false,false,true,false);
-            SetSkillIcons("small", Icon1);
-            SetSkillIcons("Big", Icon2);
+            SetSkillIcons("dart", Icon1);
+            SetSkillIcons("bigdart", Icon2);
             BombNums = 5;
             BombPower = 4;
             MoveSpeed = 5.0f;
             EleWeaponNums = 1;
             MedicalNums = 1;
+            audio1.clip = SetClip("boss21");
+            audio2.clip = SetClip("boss22");
             role = Role.boss2;
             //this.transform.name = "Boss2";
         }
@@ -350,13 +358,15 @@ public class Player : NetworkBehaviour {
         else if (playerNumber == 4)
         {
             SetModel(false,false,false,true);
-            SetSkillIcons("small", Icon1);
-            SetSkillIcons("Big", Icon2);
+            SetSkillIcons("banana", Icon1);
+            SetSkillIcons("overturn", Icon2);
             BombNums = 5;
             BombPower = 4;
             MoveSpeed = 5.0f;
             EleWeaponNums = 1;
             MedicalNums = 1;
+            audio1.clip = SetClip("boss31");
+            audio2.clip = SetClip("boss32");
             role = Role.boss3;
             //this.transform.name = "Boss3";
         }
@@ -631,6 +641,7 @@ public class Player : NetworkBehaviour {
             if(Input.GetKeyDown(KeyCode.K))
             {
                 //使用电击武器
+                audio2.Play();
                 EleWeaponNums--;
                 CmdUseWeapons();
             }
@@ -653,6 +664,7 @@ public class Player : NetworkBehaviour {
             if (this.GetComponent<SurvivalSlider>().processOver)
             {
                 //使用医疗包
+                audio1.Play();
                 MedicalNums--;
                 status = Status.normal;
                 this.GetComponent<SurvivalSlider>().processOver = false;
@@ -909,6 +921,7 @@ public class Player : NetworkBehaviour {
         //放置障碍物（冷却时间：2秒）
         if(flagSmall&&Input.GetKey(KeyCode.J))
         {
+            audio1.Play();
             CmdPlaceBox();
             flagSmall = false;
         }
@@ -918,6 +931,7 @@ public class Player : NetworkBehaviour {
         //刷新全图box
         if(flagBig&&Input.GetKey(KeyCode.K))
         {
+            audio2.Play();
             CmdFreshAllBox();
             flagBig = false;
         }
@@ -945,6 +959,7 @@ public class Player : NetworkBehaviour {
         //朝前扔出一个飞镖立马引爆炸弹（冷却时间5秒）
         if (flagSmall && Input.GetKey(KeyCode.J))
         {
+            audio1.Play();
             CmdThrowDarts();
             flagSmall = false;
         }
@@ -955,6 +970,7 @@ public class Player : NetworkBehaviour {
         //朝身体四个方向同时射出飞镖（冷却时间30秒）
         if (flagBig && Input.GetKey(KeyCode.K))
         {
+            audio2.Play();
             CmdThrowAllDarts();
             flagBig = false;
         }
@@ -997,6 +1013,7 @@ public class Player : NetworkBehaviour {
         //放置香蕉皮，玩家踩中后速度降低为原来的一半，持续10秒，冷却时间5秒
         if (flagSmall && Input.GetKey(KeyCode.J))
         {
+            audio1.Play();
             CmdBanana();
             flagSmall = false;
         }
@@ -1007,6 +1024,7 @@ public class Player : NetworkBehaviour {
         //两极反转，游戏中所有玩家控制反向，持续5秒，冷却时间30秒
         if (flagBig && Input.GetKey(KeyCode.K))
         {
+            audio2.Play();
             CmdOpposite();
             flagBig = false;
         }
@@ -1059,4 +1077,10 @@ public class Player : NetworkBehaviour {
         }
     }
     #endregion
+
+    public AudioClip SetClip(string path)
+    {
+        AudioClip clip = (AudioClip)Resources.Load("music/" + path, typeof(AudioClip));
+        return clip;
+    }
 }
